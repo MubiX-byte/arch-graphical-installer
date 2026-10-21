@@ -1,0 +1,6 @@
+* text=auto
+*.sh text eol=lf
+scripts/arch-graphical-installer text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.rules text eol=lf
