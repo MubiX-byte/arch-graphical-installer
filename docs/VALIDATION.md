@@ -15,3 +15,11 @@
 
 Skrypty QEMU i asercje po restarcie dostarczono w repozytorium. Do czasu wykonania
 macierzy z VM-TESTS.md wersja pozostaje eksperymentalnym pierwszym etapem.
+
+## Poprawka startu Legacy BIOS
+
+Usunięto wymóg UEFI z run.sh. Dodano wykrywanie firmware w GUI, walidację zgodności
+planu z firmware, GPT/ef02 dla BIOS, GRUB i386-pc na całym dysku oraz weryfikację
+plików BIOS GRUB. Testy obejmują plan BIOS bez formatowania partycji osadzania,
+odrzucanie systemd-boot w BIOS, sprawdzanie EFI/Secure Boot oraz przejście GUI
+w obu trybach. Rzeczywiste uruchomienie z dysku w BIOS pozostaje niezweryfikowane.

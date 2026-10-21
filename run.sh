@@ -30,7 +30,11 @@ trap 'printf "\nPrzygotowanie przerwane (wiersz %s). Instalator nie został uruc
   fail 'Ten skrypt uruchamiaj w Arch Linux Live ISO.'
 [[ $EUID -eq 0 ]] || fail 'Uruchom: sudo bash run.sh (na oficjalnym ISO jesteś już rootem).'
 [[ $(uname -m) == x86_64 ]] || fail 'Wymagana architektura x86_64.'
-[[ -d /sys/firmware/efi ]] || fail 'Uruchom pendrive w trybie UEFI.'
+if [[ -d /sys/firmware/efi ]]; then
+  printf 'Wykryto firmware: UEFI.\n'
+else
+  printf 'Wykryto firmware: Legacy BIOS — instalator wybierze GRUB i partycję BIOS Boot.\n'
+fi
 [[ -d /run/systemd/system ]] || fail 'Wymagana działająca sesja systemd Live ISO.'
 
 src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)

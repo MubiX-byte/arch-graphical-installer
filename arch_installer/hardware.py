@@ -35,6 +35,20 @@ def internet():
         if response.status != 200 or not response.read(1024):
             raise RuntimeError("Repozytorium Arch Linux jest niedostępne")
 
+def validate_firmware(mode, efi_root=Path("/sys/firmware/efi")):
+    actual = "uefi" if efi_root.is_dir() else "bios"
+    if mode != actual:
+        raise RuntimeError("Tryb firmware nie zgadza się z zatwierdzonym planem. Utwórz plan ponownie.")
+    if mode == "bios":
+        return
+    if not (efi_root / "efivars").is_dir():
+        raise RuntimeError("UEFI wykryte, ale zmienne EFI są niedostępne; nie przełączam na BIOS")
+    if (efi_root / "fw_platform_size").read_text().strip() != "64":
+        raise RuntimeError("Wymagany 64-bitowy firmware UEFI")
+    secure = list((efi_root / "efivars").glob("SecureBoot-*"))
+    if not secure or secure[0].read_bytes()[4:5] != b"\x00":
+        raise RuntimeError("Nie można potwierdzić wyłączenia Secure Boot")
+
 def inspect():
     if platform.system() != "Linux":
         return {"error": "Instalacja wymaga Arch Linux Live ISO", "disks": []}

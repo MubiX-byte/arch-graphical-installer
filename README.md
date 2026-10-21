@@ -8,7 +8,7 @@ wszystkie znajdujące się na nim partycje.
 
 ## Jeden skrypt: paczki, pulpit i instalator
 
-Uruchom oficjalne Arch Linux Live ISO w trybie UEFI i połącz internet. Pobierz
+Uruchom oficjalne Arch Linux Live ISO w trybie UEFI albo Legacy BIOS i połącz internet. Pobierz
 repozytorium, a w jego katalogu uruchom jako root:
 
 ```bash
@@ -50,11 +50,12 @@ modelu konfiguracji, sprzętu, planowania i wykonania.
 
 ## Obsługiwany zakres
 
-- Arch Linux Live ISO x86_64, 64-bitowe UEFI, wyłączony Secure Boot.
+- Arch Linux Live ISO x86_64: Legacy BIOS albo 64-bitowe UEFI z wyłączonym Secure Boot.
 - Cały nieużywany dysk SATA/SCSI, NVMe lub virtio, minimum 32 GiB, bez flagi removable.
-- GPT: 2 GiB EFI FAT32 pod `/boot`, reszta ext4 pod `/`.
+- UEFI/GPT: 2 GiB EFI FAT32 pod `/boot`, reszta ext4 pod `/`.
+- BIOS/GPT: 2 MiB nieformatowanej partycji BIOS Boot (ef02), reszta ext4 pod `/`, katalog `/boot` na root.
 - Jednocześnie linux, linux-lts, linux-zen i linux-hardened z nagłówkami.
-- GRUB albo systemd-boot, wpisy dla wybranych kerneli.
+- GRUB dla BIOS (`i386-pc`) i UEFI; systemd-boot wyłącznie dla UEFI. Wpisy dla wybranych kerneli.
 - KDE Plasma, GNOME, XFCE, Cinnamon, i3 lub instalacja bez GUI.
 - Locale PL/EN/DE, klawiatura pl/us/de, strefy z zoneinfo, hostname, użytkownik,
   sudo, Bash/Zsh/Fish. Root zablokowany, brak automatycznego logowania w systemie docelowym.
@@ -71,7 +72,7 @@ widoczne w danych lsblk; aplikacja nie identyfikuje wiarygodnie nazw istniejący
 ## Funkcje zablokowane lub niedostępne
 
 Dual boot i ponowne użycie ESP, ręczny edytor partycji, zmniejszanie partycji,
-Legacy BIOS/MBR, LUKS2, Btrfs/subwolumeny/Snapper, osobne `/home`, swapfile,
+Tablica partycji MBR (BIOS używa GPT), LUKS2, Btrfs/subwolumeny/Snapper, osobne `/home`, swapfile,
 Hyprland, automatyczny dobór sterowników NVIDIA, multilib, własne mirrory,
 firewall, autologowanie, hasło root, języki interfejsu inne niż polski.
 NVIDIA jest blokowana na etapie preflight, zamiast instalowania przypadkowego

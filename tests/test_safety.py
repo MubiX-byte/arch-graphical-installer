@@ -35,6 +35,24 @@ class SafetyTests(unittest.TestCase):
         self.assertEqual(partition("/dev/nvme0n1", 2), "/dev/nvme0n1p2")
         self.assertEqual(partition("/dev/sda", 2), "/dev/sda2")
 
+    def test_bios_plan_reserves_unformatted_embedding_partition(self):
+        c = self.config(firmware="bios")
+        steps = storage_plan(c)
+        table = next(s.argv for s in steps if "--clear" in s.argv)
+        self.assertIn("--typecode=1:ef02", table)
+        self.assertIn("--new=1:0:+2M", table)
+        self.assertFalse(any(s.argv[0] == "mkfs.fat" for s in steps))
+        formatting = [s.argv for s in steps if s.argv[0].startswith("mkfs")]
+        self.assertEqual(formatting, [("mkfs.ext4", "-F", "/dev/nvme0n1p2")])
+        self.assertEqual([s.argv for s in steps if s.argv[0] == "mount"],
+                         [("mount", "/dev/nvme0n1p2", "/mnt/arch-graphical-installer")])
+        self.assertIn("grub", packages(c))
+        self.assertNotIn("efibootmgr", packages(c))
+
+    def test_systemd_boot_is_rejected_on_bios(self):
+        with self.assertRaisesRegex(ValueError, "Legacy BIOS wymaga GRUB"):
+            storage_plan(self.config(firmware="bios", bootloader="systemd-boot"))
+
     def test_no_commands_during_plan(self):
         with patch("subprocess.run", side_effect=AssertionError("side effect")):
             result = summary(self.config())

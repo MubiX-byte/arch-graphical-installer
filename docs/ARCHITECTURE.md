@@ -34,10 +34,16 @@ partycjonowania. Root uruchamia wyłącznie zainstalowaną kopię helpera w kata
 
 ## Kolejność wykonania
 
-Preflight → ponowny odczyt dysku → GPT → FAT32/ext4 → mount → sprawdzone
+Preflight → ponowny odczyt dysku → GPT → systemy plików → mount → sprawdzone
 pakiety z pacstrap → genfstab → locale, czas, konta i sudo → usługi → mkinitcpio
 → bootloader → sprawdzenie plików → sync → umount → komunikat sukcesu.
 Pacstrap instaluje bazę, kernele i desktop w jednej transakcji.
+
+Tryb firmware wykrywa GUI i zapisuje w zatwierdzonym planie. Backend porównuje
+go z rzeczywistym startem Live przed operacjami na dysku. UEFI wymaga ESP FAT32,
+a BIOS używa nieformatowanej partycji ef02 do osadzenia GRUB i root ext4.
+W BIOS nie tworzy się ESP i nie wywołuje efibootmgr. Brak dostępnych zmiennych
+EFI przy wykrytym UEFI pozostaje błędem, nie powoduje przełączenia na BIOS.
 
 Postęp odpowiada zakończonym etapom, nie liczbie pobranych bajtów. Wyjście
 polecenia trafia do logu po jego zakończeniu; długie pacstrap może pozostawać na

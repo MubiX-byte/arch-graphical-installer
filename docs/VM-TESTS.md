@@ -46,10 +46,30 @@ Sprawdź dodatkowo `uname -r`, `locale`, `timedatectl`, `getent hosts archlinux.
 | Zła nazwa potwierdzanego dysku | Brak uruchomienia helpera. |
 | Zamontowana partycja / aktywny swap | Dysk niedostępny albo odrzucony przy ostatniej walidacji. |
 | Zmiana dysku po podsumowaniu | Fingerprint nie pasuje, instalacja zatrzymana. |
-| BIOS / Secure Boot / NVIDIA | Jawna blokada przed partycjonowaniem. |
+| BIOS + GPT + GRUB | Start skryptu bez EFI, BIOS Boot ef02 bez formatowania, GRUB i boot z dysku bez ISO. |
+| BIOS + systemd-boot | Niedostępny wybór w GUI i odrzucenie konfiguracji przez backend. |
+| Secure Boot / NVIDIA | Jawna blokada przed partycjonowaniem. |
 | Drugi dysk z danymi | Zapisz hash drugiego qcow2; po instalacji hash ma pozostać taki sam. |
 | Przerwanie helpera | Procesy potomne zakończone, próba odmontowania, brak deklaracji sukcesu. |
 
 Test drugiego dysku wykonuj wyłącznie na obrazach testowych. Skrypt qemu-test
 domyślnie podłącza jeden dysk. Testy błędów i bootu powtarzaj dla nowych wersji
 archiso, systemd, pacstrap oraz pakietów desktopowych.
+
+## Legacy BIOS
+
+Do niezależnego testu SeaBIOS użyj nowego obrazu dysku. Nie są potrzebne obrazy OVMF:
+
+```bash
+FIRMWARE=bios bash scripts/qemu-test.sh install test-bios.qcow2 /ścieżka/installer.iso
+# Po zakończeniu instalacji zamknij VM i uruchom bez ISO:
+FIRMWARE=bios bash scripts/qemu-test.sh boot test-bios.qcow2
+# W uruchomionym systemie docelowym:
+FIRMWARE=bios bash tests/integration/verify-installed.sh tester
+```
+
+W podsumowaniu GUI powinno być `firmware: bios`, partycja BIOS Boot 2 MiB
+(bez mkfs) i root ext4. Dla błędu „Uruchom pendrive w trybie UEFI” wystarczy
+zaktualizować repozytorium przez `git pull --ff-only` i ponowić `bash run.sh`.
+Test bootu BIOS i UEFI w QEMU nadal wymaga wykonania; testy jednostkowe
+i test GUI sprawdzają plan i polecenia, a nie rzeczywisty start systemu.

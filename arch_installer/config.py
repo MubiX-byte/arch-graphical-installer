@@ -24,6 +24,7 @@ class Config:
     desktop: str = "KDE Plasma"
     kernels: list[str] = field(default_factory=lambda: ["linux"])
     bootloader: str = "grub"
+    firmware: str = "uefi"
     shell: str = "bash"
     zram: bool = True
     bluetooth: bool = False
@@ -47,6 +48,10 @@ class Config:
             raise ValueError("Niepoprawny wybór kernela")
         if self.bootloader not in ("grub", "systemd-boot"):
             raise ValueError("Nieobsługiwany bootloader")
+        if self.firmware not in ("uefi", "bios"):
+            raise ValueError("Nieobsługiwany tryb firmware")
+        if self.firmware == "bios" and self.bootloader != "grub":
+            raise ValueError("Legacy BIOS wymaga GRUB; systemd-boot obsługuje wyłącznie UEFI")
         if len(self.extras) > 100 or any(not re.fullmatch(r"[a-z0-9][a-z0-9@+_.-]*", p) for p in self.extras):
             raise ValueError("Niepoprawne nazwy dodatkowych pakietów")
         for name in ("zram", "bluetooth", "trim"):

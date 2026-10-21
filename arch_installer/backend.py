@@ -8,7 +8,7 @@ import signal
 import subprocess
 from pathlib import Path
 from .config import Config, DESKTOPS, validate_password
-from .hardware import disks, eligible, fingerprint, internet, query
+from .hardware import disks, eligible, fingerprint, internet, query, validate_firmware
 from .plan import storage_plan, packages, partition
 
 TARGET = Path("/mnt/arch-graphical-installer")
@@ -74,16 +74,10 @@ class Installer:
             raise RuntimeError("Wymagany root i Arch Linux x86_64")
         if not Path("/run/archiso").is_dir() or not Path("/etc/arch-release").exists():
             raise RuntimeError("Instalacja dozwolona tylko w Arch Live ISO")
-        if not Path("/sys/firmware/efi/efivars").is_dir():
-            raise RuntimeError("Wymagany start w UEFI; Legacy BIOS zablokowany")
-        if Path("/sys/firmware/efi/fw_platform_size").read_text().strip() != "64":
-            raise RuntimeError("Wymagany 64-bitowy firmware UEFI")
+        validate_firmware(self.c.firmware)
         ram = next(line.split()[1] for line in Path("/proc/meminfo").read_text().splitlines() if line.startswith("MemTotal:"))
         if int(ram) < 2 * 1024**2:
             raise RuntimeError("Wymagane co najmniej 2 GiB RAM; dla GUI zalecane 6 GiB")
-        secure = list(Path("/sys/firmware/efi/efivars").glob("SecureBoot-*"))
-        if not secure or secure[0].read_bytes()[4:5] != b"\x00":
-            raise RuntimeError("Nie można potwierdzić wyłączenia Secure Boot")
         for program in ("sgdisk", "partprobe", "udevadm", "mkfs.fat", "mkfs.ext4", "mount", "umount", "pacstrap", "arch-chroot", "genfstab", "pacman", "lsblk", "lspci", "lsusb", "timedatectl"):
             if not shutil.which(program):
                 raise RuntimeError(f"Brak narzędzia: {program}")
@@ -144,7 +138,10 @@ class Installer:
 
     def bootloader(self):
         if self.c.bootloader == "grub":
-            self.chroot("grub-install", "--target=x86_64-efi", "--efi-directory=/boot", "--bootloader-id=ArchGraphical")
+            if self.c.firmware == "bios":
+                self.chroot("grub-install", "--target=i386-pc", self.c.disk)
+            else:
+                self.chroot("grub-install", "--target=x86_64-efi", "--efi-directory=/boot", "--bootloader-id=ArchGraphical")
             self.chroot("grub-mkconfig", "-o", "/boot/grub/grub.cfg")
         else:
             # Run from the live host: bootctl inside arch-chroot's PID namespace
@@ -164,7 +161,11 @@ class Installer:
         required = ["etc/fstab", "etc/passwd", "usr/bin/sudo"]
         required += [f"boot/vmlinuz-{k}" for k in self.c.kernels]
         required += [f"boot/initramfs-{k}.img" for k in self.c.kernels]
-        required += ["boot/EFI/ArchGraphical/grubx64.efi", "boot/grub/grub.cfg"] if self.c.bootloader == "grub" else ["boot/EFI/systemd/systemd-bootx64.efi"]
+        if self.c.bootloader == "grub":
+            required += ["boot/grub/grub.cfg"]
+            required += ["boot/grub/i386-pc/core.img"] if self.c.firmware == "bios" else ["boot/EFI/ArchGraphical/grubx64.efi"]
+        else:
+            required += ["boot/EFI/systemd/systemd-bootx64.efi"]
         if any(not (TARGET / p).is_file() or not (TARGET / p).stat().st_size for p in required):
             raise RuntimeError("Brakuje wymaganych plików zainstalowanego systemu")
         self.chroot("systemctl", "is-enabled", "NetworkManager")

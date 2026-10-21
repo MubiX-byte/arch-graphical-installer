@@ -22,7 +22,9 @@ def packages(c, cpu="", pci=""):
     if "[1002:" in pci:
         result += ["vulkan-radeon", "libva-mesa-driver"]
     if c.bootloader == "grub":
-        result += ["grub", "efibootmgr"]
+        result += ["grub"]
+        if c.firmware == "uefi":
+            result += ["efibootmgr"]
     if c.zram:
         result += ["zram-generator"]
     if c.bluetooth:
@@ -32,6 +34,13 @@ def packages(c, cpu="", pci=""):
 def storage_plan(c, target="/mnt/arch-graphical-installer"):
     c.validate()
     esp, root = partition(c.disk, 1), partition(c.disk, 2)
+    if c.firmware == "bios":
+        return [Step("Usunięcie tablicy partycji", ("sgdisk", "--zap-all", c.disk)),
+                Step("GPT: BIOS Boot 2 MiB (bez systemu plików) + root", ("sgdisk", "--clear", "--new=1:0:+2M", "--typecode=1:ef02", "--new=2:0:0", "--typecode=2:8300", c.disk)),
+                Step("Odczyt nowej tablicy", ("partprobe", c.disk)),
+                Step("Oczekiwanie na urządzenia", ("udevadm", "settle")),
+                Step("Formatowanie root ext4", ("mkfs.ext4", "-F", root)),
+                Step("Montowanie root (/boot w root)", ("mount", root, target))]
     return [Step("Usunięcie tablicy partycji", ("sgdisk", "--zap-all", c.disk)),
             Step("GPT: EFI 2 GiB + root", ("sgdisk", "--clear", "--new=1:0:+2G", "--typecode=1:ef00", "--new=2:0:0", "--typecode=2:8300", c.disk)),
             Step("Odczyt nowej tablicy", ("partprobe", c.disk)),

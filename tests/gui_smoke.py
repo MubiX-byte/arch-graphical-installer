@@ -23,5 +23,14 @@ assert window.pages.currentIndex() == 2
 assert "safe-test-password" not in window.review.toPlainText()
 assert "sgdisk" in window.review.toPlainText()
 window.toggle_theme()
+window.pages.setCurrentIndex(1)
+window.disk.clear()
+window.probed({"uefi": False, "disks": [{"name": "/dev/vda", "type": "disk", "size": 48 * 1024**3, "serial": "bios-test"}]})
+assert window.bootloader.count() == 1
+assert window.bootloader.currentText() == "grub"
+window.navigate(1)
+assert window.approved_config.firmware == "bios"
+assert "ef02" in window.review.toPlainText()
+assert "mkfs.fat" not in window.review.toPlainText()
 window.close()
 print("GUI smoke: PASS")

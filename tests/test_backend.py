@@ -56,6 +56,16 @@ class BackendTests(unittest.TestCase):
         self.assertIn("--variables=yes", commands[0])
         self.assertIn("--install-source=image", commands[0])
 
+    def test_bios_grub_targets_entire_disk(self):
+        obj = self.installer()
+        obj.c.firmware = "bios"
+        with patch.object(obj, "chroot") as chroot:
+            obj.bootloader()
+        self.assertEqual(chroot.call_args_list[0].args,
+                         ("grub-install", "--target=i386-pc", "/dev/vda"))
+        self.assertEqual(chroot.call_args_list[1].args,
+                         ("grub-mkconfig", "-o", "/boot/grub/grub.cfg"))
+
     def test_pacstrap_failure_cleans_mounts_and_never_bootloads(self):
         obj = self.installer()
         obj.package_list = ["base", "linux"]

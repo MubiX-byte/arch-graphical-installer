@@ -73,9 +73,9 @@ class Window(QMainWindow):
 
     def welcome_page(self):
         layout = self.page("Witaj. Zainstaluj Arch Linux.")
-        label = QLabel("Wersja etapowa: UEFI • GPT • cały dysk • ext4\n"
+        label = QLabel("Wersja etapowa: UEFI lub Legacy BIOS • GPT • cały dysk • ext4\n"
                        "Wybór dysku nie wprowadza zmian. Instalacja wymaga osobnego potwierdzenia.\n"
-                       "Dual boot, ręczne partycjonowanie, LUKS, Btrfs, BIOS, Hyprland i NVIDIA\n"
+                       "Dual boot, ręczne partycjonowanie, LUKS, Btrfs, Hyprland i NVIDIA\n"
                        "nie są jeszcze obsługiwane. Secure Boot musi być wyłączony.")
         label.setWordWrap(True)
         layout.addWidget(label)
@@ -169,6 +169,8 @@ class Window(QMainWindow):
 
     def probed(self, hardware):
         self.hardware = hardware
+        self.bootloader.clear()
+        self.bootloader.addItems(["grub", "systemd-boot"] if hardware.get("uefi", True) else ["grub"])
         self.hardware_text.setPlainText(json.dumps(hardware, ensure_ascii=False, indent=2))
         for d in hardware["disks"]:
             if eligible(d):
@@ -188,6 +190,7 @@ class Window(QMainWindow):
                    username=self.username.text(), locale=self.locale.currentText(), keymap=self.keymap.currentText(),
                    timezone=self.timezone.text(), desktop=self.desktop.currentText(),
                    kernels=[w.text() for w in self.kernels if w.isChecked()], bootloader=self.bootloader.currentText(),
+                   firmware="uefi" if self.hardware.get("uefi", True) else "bios",
                    shell=self.shell.currentText(), zram=self.zram.isChecked(), bluetooth=self.bluetooth.isChecked(),
                    trim=self.trim.isChecked(), extras=self.extras.text().split())
         c.validate()
