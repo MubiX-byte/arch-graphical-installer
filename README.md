@@ -6,6 +6,41 @@ specyfikacji. Wykonuje rzeczywiste polecenia instalacji. Wymaga testów pełnego
 cyklu w QEMU przed użyciem na sprzęcie z danymi. Instalacja na całym dysku usuwa
 wszystkie znajdujące się na nim partycje.
 
+## Jeden skrypt: paczki, pulpit i instalator
+
+Uruchom oficjalne Arch Linux Live ISO w trybie UEFI i połącz internet. Pobierz
+repozytorium, a w jego katalogu uruchom jako root:
+
+```bash
+bash run.sh
+```
+
+To jedyne polecenie potrzebne do przygotowania i uruchomienia aplikacji.
+`run.sh` instaluje pakiety Pythona/PySide6 oraz wszystkie narzędzia instalacyjne,
+NetworkManager, Xorg, Xfce, LightDM i polkit. Tworzy dedykowane konto `agi-live`,
+ustawia autologowanie do pulpitu Live i automatycznie otwiera GUI. Nie trzeba
+ręcznie tworzyć kont, ustawiać haseł Live ani wywoływać startx.
+
+Przy pierwszym pobieraniu projektu możesz użyć:
+
+```bash
+pacman -Sy --needed --noconfirm git
+git clone https://github.com/MubiX-byte/arch-graphical-installer.git
+cd arch-graphical-installer
+bash run.sh
+```
+
+Skrypt następnie wykonuje pełne `pacman -Syu` wraz z instalacją zależności.
+Wymagany jest działający internet do pierwszego pobrania pakietów. Jeśli po
+przełączeniu z iwd/networkd na NetworkManager zniknie Wi-Fi, skrypt otworzy
+`nmtui-connect`, aby ponownie wybrać sieć. Hasła Wi-Fi nie trafiają do logu.
+
+Przygotowanie nie wykonuje partycjonowania ani formatowania. Właściwą instalację
+systemu zatwierdzasz dopiero w GUI. Konto Live i jego autologowanie nie są
+kopiowane do systemu docelowego. Skrypt jest przeznaczony dla konsoli Live ISO;
+nie uruchamiaj go na zainstalowanym Arch Linux. Ponowne wywołanie nie restartuje
+aktywnego LightDM: aplikację można wtedy otworzyć z menu pulpitu.
+
 ## Architektura
 
 `GUI (zwykły użytkownik) → plan i potwierdzenie → pkexec → backend (root)`.
@@ -71,30 +106,16 @@ QT_QPA_PLATFORM=offscreen python tests/gui_smoke.py
 Na Windows GUI można sprawdzić, ale instalacja pozostaje zablokowana. GUI
 uruchamiaj jako zwykły użytkownik; backend wymaga zainstalowania w Live ISO.
 
-## Działające oficjalne Live ISO
+## Składniki uruchomienia Live
 
-Po uruchomieniu oficjalnego Arch ISO skonfiguruj internet, a następnie jako root:
+`run.sh` jest głównym punktem wejścia. Wykorzystuje `scripts/install-live.sh`
+do instalowania pakietów i umieszczania kopii aplikacji należącej do roota w
+`/usr/lib/arch-graphical-installer`. Samodzielne wywołanie skryptu wewnętrznego
+instaluje zależności, ale nie uruchamia pulpitu — do pełnego startu używaj `run.sh`.
 
-```bash
-bash scripts/install-live.sh
-useradd -m -s /bin/bash installer
-passwd installer
-passwd root
-su - installer
-startx /usr/bin/startxfce4
-```
-
-W sesji Xfce uruchom agenta polkit, jeśli nie wystartował automatycznie:
-
-```bash
-/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-arch-graphical-installer
-```
-
-Przycisk konfiguracji sieci otwiera `nm-connection-editor`; można wybrać Wi-Fi
-i wprowadzić hasło poza procesem instalatora. Helper poprosi o uwierzytelnienie
-polkit hasłem administratora Live. Te konta i hasła Live nie trafiają do systemu
-docelowego. Live musi mieć zsynchronizowany czas i dostęp do repozytoriów HTTPS.
+Przycisk sieci w GUI otwiera `nm-connection-editor`. Reguła polkit dotyczy
+wyłącznie konkretnego helpera i lokalnego aktywnego konta `agi-live`. Nie nadaje
+temu kontu ogólnych uprawnień sudo.
 
 ## Własny obraz ISO
 

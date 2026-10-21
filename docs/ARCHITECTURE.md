@@ -8,13 +8,14 @@ partycjonowania. Root uruchamia wyłącznie zainstalowaną kopię helpera w kata
 | Plik | Odpowiedzialność i współpraca |
 | --- | --- |
 | main.py | Start GUI lub czysty plan dry-run, bez importowania Qt/backendu w dry-run. |
+| run.sh | Jednopoleceniowe przygotowanie oficjalnego Live ISO: zależności, NetworkManager, konto agi-live, LightDM/Xfce, polkit i autostart GUI. Nie dotyka partycji. |
 | helper.py | Izolowany punkt wejścia do backendu, odczyt pojedynczego żądania. |
 | arch_installer/config.py | Model konfiguracji, walidacja list dozwolonych wartości i haseł, definicje desktopów. |
 | arch_installer/hardware.py | Odczyt lsblk/lscpu/lspci/lsusb/nmcli, fingerprint dysku, sprawdzenie repozytorium HTTPS. |
 | arch_installer/plan.py | Deterministyczny plan GPT/ext4, lista pakietów i publiczne podsumowanie. |
 | arch_installer/backend.py | Powtórna walidacja, blokada procesu, preflight, polecenia, konfiguracja systemu, bootloader, weryfikacja i cleanup. |
 | arch_installer/gui.py | Cztery ekrany, QThread do wykrywania sprzętu, asynchroniczny QProcess, progres ze zdarzeń backendu, eksport planu/logów. |
-| scripts/install-live.sh | Instalacja zależności oraz kopii aplikacji należącej do roota w działającym Live ISO. |
+| scripts/install-live.sh | Wewnętrzny etap run.sh: instalacja zależności oraz kopii aplikacji należącej do roota w działającym Live ISO. |
 | scripts/build-iso.sh | Rozszerzenie profilu releng z archiso, hook tworzący użytkownika live, autologowanie i Xfce. |
 | scripts/arch-graphical-installer | Launcher zainstalowanej kopii. |
 | scripts/qemu-test.sh | Osobne uruchomienie instalacyjnego ISO i uruchomienie zainstalowanego dysku bez ISO. |
@@ -25,6 +26,7 @@ partycjonowania. Root uruchamia wyłącznie zainstalowaną kopię helpera w kata
 | tests/test_safety.py | Walidacja, dry-run bez poleceń, zajęte dyski, zmiana tożsamości i macierz pakietów. |
 | tests/test_backend.py | Testy backendu na Linuksie: brak potwierdzenia, wymiana dysku, ograniczenia ścieżek, hasła, błędy poleceń i bootctl. |
 | tests/gui_smoke.py | Test przejścia przez formularz i plan w Qt offscreen. |
+| tests/test_bootstrap.py | Sprawdzenie pomocy, błędnych argumentów i odrzucenia niewłaściwego systemu przed uruchomieniem pacman. |
 | tests/integration/verify-installed.sh | Asercje na systemie uruchomionym z dysku VM. |
 | .github/workflows/tests.yml | Automatyczne testy bez uprzywilejowanych operacji dyskowych. |
 | examples/config.json | Jawna przykładowa konfiguracja bez haseł. |
