@@ -14,4 +14,8 @@ jobs:
       - run: python -m compileall -q arch_installer main.py helper.py
       - run: for script in scripts/*.sh iso/customize.fragment.sh tests/integration/*.sh; do bash -n "$script"; done
       - run: pip install -r requirements.txt
+      - name: Install Qt runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libopengl0 libxkbcommon0
       - run: QT_QPA_PLATFORM=offscreen python tests/gui_smoke.py

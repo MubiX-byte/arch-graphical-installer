@@ -2,6 +2,9 @@
 
 - Windows, Python 3.11+: testy walidacji/planu/CLI zakończone sukcesem.
 - Testy uprzywilejowanego backendu są pomijane na Windows; uruchamia je Linux CI.
+- Linux CI: 17 testów jednostkowych, compileall i sprawdzenie składni Bash przeszły.
+  Pierwszy test GUI ujawnił brak biblioteki libEGL na runnerze; workflow uzupełniono
+  o biblioteki runtime Qt.
 - PySide6 6.12.0: test GUI offscreen przeszedł przez ekran powitalny, formularz,
   podsumowanie i zmianę motywu. Hasło nie pojawia się w podsumowaniu.
 - Wszystkie moduły Pythona przeszły compileall.
