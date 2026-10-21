@@ -38,7 +38,7 @@ fi
 [[ -d /run/systemd/system ]] || fail 'Wymagana działająca sesja systemd Live ISO.'
 
 src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-for file in scripts/install-live.sh main.py helper.py arch_installer/gui.py assets/arch-graphical-installer.desktop iso/49-live-installer.rules; do
+for file in scripts/install-live.sh scripts/live-space.sh main.py helper.py arch_installer/gui.py assets/arch-graphical-installer.desktop iso/49-live-installer.rules; do
   [[ -f "$src/$file" ]] || fail "Brakuje pliku repozytorium: $file. Pobierz całe repozytorium."
 done
 

@@ -23,3 +23,13 @@ planu z firmware, GPT/ef02 dla BIOS, GRUB i386-pc na całym dysku oraz weryfikac
 plików BIOS GRUB. Testy obejmują plan BIOS bez formatowania partycji osadzania,
 odrzucanie systemd-boot w BIOS, sprawdzanie EFI/Secure Boot oraz przejście GUI
 w obu trybach. Rzeczywiste uruchomienie z dysku w BIOS pozostaje niezweryfikowane.
+
+## Poprawka braku miejsca w Live ISO
+
+Przed transakcją zależności skrypt sprawdza wolne miejsce oraz MemAvailable.
+Wymagany budżet obejmuje pełny Installed Size wszystkich pakietów transakcji
+(bez odejmowania poprzednich wersji na overlay), pobieranie oraz 512 MiB zapasu.
+Na rozpoznanym tmpfs cowspace może zwiększyć limit, zachowując 1 GiB RAM dla
+działających procesów. Trwałych systemów plików i partycji nie powiększa.
+Testy symulują sondy systemowe i mount; rzeczywistego remount w Arch Live ISO
+nie wykonano w środowisku Windows.

@@ -31,6 +31,13 @@ bash run.sh
 ```
 
 Skrypt następnie wykonuje pełne `pacman -Syu` wraz z instalacją zależności.
+Przed instalacją wylicza miejsce na pełne rozpakowane pakiety, pobieranie i zapas.
+Na standardowym Live ISO automatycznie zwiększa limit tmpfs
+`/run/archiso/cowspace`, jeżeli RAM pozwala obsłużyć transakcję i zachować 1 GiB
+dla pulpitu. Nie powiększa partycji dysku i nie wyłącza kontroli miejsca pacmana.
+Przy niedostatecznej pamięci zatrzymuje się z informacją o wymaganym RAM;
+dla pobierania całego GUI zalecane jest zwykle 6–8 GiB RAM maszyny wirtualnej.
+Zwiększenie rozmiaru wirtualnego dysku nie powiększa warstwy Live w RAM.
 Wymagany jest działający internet do pierwszego pobrania pakietów. Jeśli po
 przełączeniu z iwd/networkd na NetworkManager zniknie Wi-Fi, skrypt otworzy
 `nmtui-connect`, aby ponownie wybrać sieć. Hasła Wi-Fi nie trafiają do logu.

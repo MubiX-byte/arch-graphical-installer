@@ -16,6 +16,7 @@ partycjonowania. Root uruchamia wyłącznie zainstalowaną kopię helpera w kata
 | arch_installer/backend.py | Powtórna walidacja, blokada procesu, preflight, polecenia, konfiguracja systemu, bootloader, weryfikacja i cleanup. |
 | arch_installer/gui.py | Cztery ekrany, QThread do wykrywania sprzętu, asynchroniczny QProcess, progres ze zdarzeń backendu, eksport planu/logów. |
 | scripts/install-live.sh | Wewnętrzny etap run.sh: instalacja zależności oraz kopii aplikacji należącej do roota w działającym Live ISO. |
+| scripts/live-space.sh | Kontrola RAM i wolnego miejsca, wyliczenie wielkości pakietów oraz zwiększanie limitu wyłącznie rozpoznanego tmpfs Archiso. |
 | scripts/build-iso.sh | Rozszerzenie profilu releng z archiso, hook tworzący użytkownika live, autologowanie i Xfce. |
 | scripts/arch-graphical-installer | Launcher zainstalowanej kopii. |
 | scripts/qemu-test.sh | Osobne uruchomienie instalacyjnego ISO i uruchomienie zainstalowanego dysku bez ISO. |
@@ -27,6 +28,7 @@ partycjonowania. Root uruchamia wyłącznie zainstalowaną kopię helpera w kata
 | tests/test_backend.py | Testy backendu na Linuksie: brak potwierdzenia, wymiana dysku, ograniczenia ścieżek, hasła, błędy poleceń i bootctl. |
 | tests/gui_smoke.py | Test przejścia przez formularz i plan w Qt offscreen. |
 | tests/test_bootstrap.py | Sprawdzenie pomocy, błędnych argumentów i odrzucenia niewłaściwego systemu przed uruchomieniem pacman. |
+| tests/test_live_space.py | Symulacja małego cowspace, braku RAM, trwałej warstwy Live i błędnych metadanych bez rzeczywistych mount. |
 | tests/integration/verify-installed.sh | Asercje na systemie uruchomionym z dysku VM. |
 | .github/workflows/tests.yml | Automatyczne testy bez uprzywilejowanych operacji dyskowych. |
 | examples/config.json | Jawna przykładowa konfiguracja bez haseł. |
