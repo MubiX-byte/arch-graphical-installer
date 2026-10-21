@@ -1,0 +1,11 @@
+{
+  "disk": "/dev/vda",
+  "hostname": "archlinux",
+  "username": "tester",
+  "locale": "pl_PL.UTF-8",
+  "keymap": "pl",
+  "timezone": "Europe/Warsaw",
+  "desktop": "KDE Plasma",
+  "kernels": ["linux", "linux-lts"],
+  "bootloader": "grub"
+}

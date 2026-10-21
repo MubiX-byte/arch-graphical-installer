@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /usr/lib/arch-graphical-installer
+exec /usr/bin/python main.py "$@"

@@ -1,0 +1,9 @@
+// Only the immutable installed helper, only in the disposable live environment.
+polkit.addRule(function(action, subject) {
+    if (action.id === "org.freedesktop.policykit.exec" &&
+        action.lookup("program") === "/usr/bin/python" &&
+        action.lookup("command_line") === "/usr/bin/python -I /usr/lib/arch-graphical-installer/helper.py" &&
+        subject.user === "live" && subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

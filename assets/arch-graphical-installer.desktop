@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Install Arch Linux
+Name[pl]=Zainstaluj Arch Linux
+Exec=arch-graphical-installer
+Icon=system-software-install
+Terminal=false
+Categories=System;
